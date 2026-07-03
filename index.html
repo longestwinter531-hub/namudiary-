@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌸 감정나무 다이어리 & 공유 게시판</title>
+<title>🌸 실시간 감정나무 다이어리 & 공유 광장</title>
 
 <style>
 /* 테마별 변수 설정 */
@@ -535,7 +535,6 @@ textarea{ width:100%; height:150px; padding:12px; border-radius:15px; border:1px
         <button class="setting-icon-btn" onclick="openSetting()" title="설정">⚙️</button>
 
         <div id="welcomeText">✨ 정원 ✨</div>
-        <!-- 🎖️ 레벨 표시 영역 추가 -->
         <div id="userLevelBadge" class="level-badge">Lv.0 씨앗 정원사</div>
         <div id="tree">🌱</div>
         
@@ -676,14 +675,17 @@ textarea{ width:100%; height:150px; padding:12px; border-radius:15px; border:1px
     </div>
 </div>
 
+<!-- 🌐 Firebase REST API 연동을 위한 자바스크립트 -->
 <script>
+// ⚠️ 여기에 본인의 파이어베이스 실시간 데이터베이스 URL 주소를 입력하세요!
+const FIREBASE_DB_URL = "https://YOUR_PROJECT_ID.firebaseio.com/"; 
+
 const deviceUserKey = "device_user_profile_v2";
 let selectedMood = ""; 
 let currentQuestion = "";
 let currentTab = "diary";
 let base64ImageTemp = ""; 
 
-// 🛑 상처 방지 금지어 리스트
 const forbiddenWords = ["바보", "멍청이", "짜증나", "지랄", "새끼", "시발", "존나", "꺼져", "극혐"];
 
 function checkBadWords(text) {
@@ -705,8 +707,8 @@ const diaryQuestions = [
 ];
 
 const balanceTopics = [
-    { id: 1, q: "떡볶이를 먹을 때 당신의 선택은?", a: "말랑말랑 떡", b: "양념 쏙 오뎅", votes: { A: 42, B: 38 } },
-    { id: 2, q: "평생 한 가지 음식만 먹어야 한다면?", a: "평생 김치찌개", b: "평생 된장찌개", votes: { A: 55, B: 49 } }
+    { id: 1, q: "떡볶이를 먹을 때 당신의 선택은?", a: "말랑말랑 떡", b: "양념 쏙 오뎅" },
+    { id: 2, q: "평생 한 가지 음식만 먹어야 한다면?", a: "평생 김치찌개", b: "평생 된장찌개" }
 ];
 
 const moodMentions = {
@@ -722,6 +724,15 @@ window.onload = function() {
     initDeviceUser();
     applyLoadedSettings();
     updateMainScreen();
+    
+    // 5초마다 자동으로 게시판 서버 데이터 갱신하기 (실시간 동기화 대용)
+    setInterval(() => {
+        if (!document.getElementById("boardScreen").classList.contains("hidden")) {
+            if (currentTab === "diary") fetchDiaries();
+            else if (currentTab === "gallery") fetchGallery();
+            else if (currentTab === "balance") fetchBalance();
+        }
+    }, 5000);
 };
 
 function initDeviceUser() {
@@ -733,8 +744,7 @@ function initDeviceUser() {
         };
         localStorage.setItem(deviceUserKey, JSON.stringify(userData));
     }
-    // 데이터 보정 (answersCount 속성이 없는 기존 구버전 유저 대응)
-    if (userData && userData.answersCount === undefined) {
+    if (userData.answersCount === undefined) {
         userData.answersCount = userData.attendanceCount || 0;
         localStorage.setItem(deviceUserKey, JSON.stringify(userData));
     }
@@ -750,7 +760,6 @@ function applyLoadedSettings() {
     document.body.style.fontFamily = userData.fontFamily || "Arial, sans-serif";
 }
 
-/* 🎖️ 답변 수에 따른 레벨 계산 엔진 */
 function calculateLevel(answersCount) {
     if (!answersCount || answersCount < 1) return { lv: 0, name: "씨앗 정원사" };
     if (answersCount === 1) return { lv: 1, name: "새싹 정원사" };
@@ -828,7 +837,6 @@ function updateMainScreen() {
     document.getElementById("welcomeText").innerText = `✨ ${userData.nickname}님의 정원 ✨`;
     document.getElementById("daysText").innerText = `총 출석 ${userData.attendanceCount}일째`;
     
-    // 🎖️ 레벨 배지 렌더링 적용
     const lvlInfo = calculateLevel(userData.answersCount);
     document.getElementById("userLevelBadge").innerText = `Lv.${lvlInfo.lv} ${lvlInfo.name} (답변: ${userData.answersCount || 0}회)`;
 
@@ -865,12 +873,9 @@ function saveDiary(shareWithBoard) {
     if (shareWithBoard && checkBadWords(text)) return; 
 
     let userData = getDeviceUser();
-    
-    // 출석수 증가 및 답변 카운트(경험치) 증가
     userData.attendanceCount += 1;
     userData.answersCount = (userData.answersCount || 0) + 1;
     
-    // 레벨업 판단 알림창 띄우기
     const prevLvl = calculateLevel(userData.answersCount - 1).lv;
     const nextLvlInfo = calculateLevel(userData.answersCount);
     if (prevLvl < nextLvlInfo.lv) {
@@ -883,17 +888,27 @@ function saveDiary(shareWithBoard) {
     saveDeviceUser(userData);
     
     if (shareWithBoard) {
-        let globalBoard = JSON.parse(localStorage.getItem("diary_board")) || [];
-        globalBoard.unshift({
-            id: Date.now(), author: userData.nickname, mood: selectedMood,
+        if (FIREBASE_DB_URL.includes("YOUR_PROJECT_ID")) {
+            alert("서버 연결 설정이 필요합니다. 개발자 가이드를 참고해 주세요!");
+            return;
+        }
+        const newPost = {
+            author: userData.nickname, mood: selectedMood,
             question: document.getElementById("question").innerText, content: text,
-            date: new Date().toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }),
-            comments: []
+            date: new Date().toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' })
+        };
+        // Firebase에 일기 저장 (POST)
+        fetch(`${FIREBASE_DB_URL}diaries.json`, {
+            method: 'POST',
+            body: JSON.stringify(newPost)
+        }).then(() => {
+            updateMainScreen();
+            goHome();
         });
-        localStorage.setItem("diary_board", JSON.stringify(globalBoard));
+    } else {
+        updateMainScreen();
+        goHome();
     }
-    updateMainScreen();
-    goHome();
 }
 
 /* 📅 기분 달력 */
@@ -950,42 +965,55 @@ function switchTab(tabName) {
     if (tabName === "diary") {
         document.getElementById("tab-diary").classList.add("active");
         document.getElementById("diaryBoardSection").classList.remove("hidden");
-        renderDiaryBoard();
+        fetchDiaries();
     } else if (tabName === "gallery") {
         document.getElementById("tab-gallery").classList.add("active");
         document.getElementById("galleryBoardSection").classList.remove("hidden");
-        renderGalleryBoard();
+        fetchGallery();
     } else if (tabName === "balance") {
         document.getElementById("tab-balance").classList.add("active");
         document.getElementById("balanceBoardSection").classList.remove("hidden");
-        renderBalanceBoard();
+        fetchBalance();
     }
 }
 
-function renderDiaryBoard() {
-    const container = document.getElementById("postListContainer"); container.innerHTML = "";
-    let globalBoard = JSON.parse(localStorage.getItem("diary_board")) || [];
-    if (globalBoard.length === 0) { container.innerHTML = "<p style='padding:20px; text-align:center; opacity:0.5;'>공유된 일기가 없습니다.</p>"; return; }
-    
-    globalBoard.forEach(post => {
-        let commentsHtml = "";
-        post.comments.forEach(c => { commentsHtml += `<div class="comment-item"><span class="comment-user">${c.writer}:</span><span>${c.text}</span></div>`; });
-        const div = document.createElement("div"); div.className = "post-item";
-        div.innerHTML = `
-            <div class="post-meta"><span>👤 ${post.author} (${post.mood})</span><span style="opacity:0.6;">${post.date}</span></div>
-            <div class="post-q">Q. ${post.question}</div><div class="post-content">${post.content}</div>
-            <div class="comment-section">
-                <div id="diary-comments-${post.id}">${commentsHtml}</div>
-                <div class="comment-input-box">
-                    <input type="text" id="diary-input-${post.id}" class="comment-input" placeholder="따뜻한 댓글을 남겨보세요.">
-                    <button class="comment-btn" onclick="addComment('diary', ${post.id})">등록</button>
-                </div>
-            </div>`;
-        container.appendChild(div);
+// 🌐 1. 일기 광장 데이터 가져오기
+function fetchDiaries() {
+    if (FIREBASE_DB_URL.includes("YOUR_PROJECT_ID")) return;
+    fetch(`${FIREBASE_DB_URL}diaries.json`)
+    .then(res => res.json())
+    .then(data => {
+        const container = document.getElementById("postListContainer");
+        container.innerHTML = "";
+        if (!data) { container.innerHTML = "<p style='padding:20px; text-align:center; opacity:0.5;'>공유된 일기가 없습니다.</p>"; return; }
+        
+        // 역순 정렬 (최신글 위로)
+        Object.keys(data).reverse().forEach(key => {
+            const post = data[key];
+            let commentsHtml = "";
+            if (post.comments) {
+                Object.keys(post.comments).forEach(cKey => {
+                    const c = post.comments[cKey];
+                    commentsHtml += `<div class="comment-item"><span class="comment-user">${c.writer}:</span><span>${c.text}</span></div>`;
+                });
+            }
+            const div = document.createElement("div"); div.className = "post-item";
+            div.innerHTML = `
+                <div class="post-meta"><span>👤 ${post.author} (${post.mood})</span><span style="opacity:0.6;">${post.date}</span></div>
+                <div class="post-q">Q. ${post.question}</div><div class="post-content">${post.content}</div>
+                <div class="comment-section">
+                    <div>${commentsHtml}</div>
+                    <div class="comment-input-box">
+                        <input type="text" id="diary-input-${key}" class="comment-input" placeholder="따뜻한 댓글을 남겨보세요.">
+                        <button class="comment-btn" onclick="addFirebaseComment('diaries', '${key}')">등록</button>
+                    </div>
+                </div>`;
+            container.appendChild(div);
+        });
     });
 }
 
-/* 📷 갤러리 관련 로직 */
+/* 📷 2. 갤러리 로직 */
 function previewGalleryImage(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -1004,88 +1032,153 @@ function uploadGalleryPost() {
     if (!base64ImageTemp) { alert("공유할 사진을 먼저 선택해 주세요!"); return; }
     if (checkBadWords(caption)) return; 
 
-    let galleryBoard = JSON.parse(localStorage.getItem("gallery_board")) || [];
-    galleryBoard.unshift({
-        id: Date.now(), author: userData.nickname, imgData: base64ImageTemp,
-        caption: caption, date: "방금 전", comments: []
-    });
-    localStorage.setItem("gallery_board", JSON.stringify(galleryBoard));
+    const newGallery = {
+        author: userData.nickname, imgData: base64ImageTemp,
+        caption: caption, date: "방금 전"
+    };
     
-    base64ImageTemp = "";
-    document.getElementById("galleryPreview").style.display = "none";
-    document.getElementById("galleryFileInput").value = "";
-    document.getElementById("galleryCaptionInput").value = "";
-    renderGalleryBoard();
-}
-
-function renderGalleryBoard() {
-    const container = document.getElementById("galleryPostContainer"); container.innerHTML = "";
-    let galleryBoard = JSON.parse(localStorage.getItem("gallery_board")) || [];
-    if(galleryBoard.length === 0) { container.innerHTML = "<p style='padding:20px; text-align:center; opacity:0.5;'>첫 번째 멋진 사진을 올려보세요!</p>"; return; }
-    
-    galleryBoard.forEach(post => {
-        let commentsHtml = "";
-        post.comments.forEach(c => { commentsHtml += `<div class="comment-item"><span class="comment-user">${c.writer}:</span><span>${c.text}</span></div>`; });
-        const div = document.createElement("div"); div.className = "post-item";
-        div.innerHTML = `
-            <div class="post-meta"><span>📷 ${post.author}님의 순간</span><span style="opacity:0.6;">${post.date}</span></div>
-            <img src="${post.imgData}" class="gallery-post-img">
-            <div class="post-content" style="font-weight:bold; margin-bottom:5px;">${post.caption}</div>
-            <div class="comment-section">
-                <div id="gallery-comments-${post.id}">${commentsHtml}</div>
-                <div class="comment-input-box">
-                    <input type="text" id="gallery-input-${post.id}" class="comment-input" placeholder="이 사진에 감상 댓글을 달아주세요!">
-                    <button class="comment-btn" onclick="addComment('gallery', ${post.id})">등록</button>
-                </div>
-            </div>`;
-        container.appendChild(div);
+    fetch(`${FIREBASE_DB_URL}gallery.json`, {
+        method: 'POST',
+        body: JSON.stringify(newGallery)
+    }).then(() => {
+        base64ImageTemp = "";
+        document.getElementById("galleryPreview").style.display = "none";
+        document.getElementById("galleryFileInput").value = "";
+        document.getElementById("galleryCaptionInput").value = "";
+        fetchGallery();
     });
 }
 
-/* 💬 공용 댓글 등록 통합 엔진 */
-function addComment(type, postId) {
+function fetchGallery() {
+    if (FIREBASE_DB_URL.includes("YOUR_PROJECT_ID")) return;
+    fetch(`${FIREBASE_DB_URL}gallery.json`)
+    .then(res => res.json())
+    .then(data => {
+        const container = document.getElementById("galleryPostContainer");
+        container.innerHTML = "";
+        if(!data) { container.innerHTML = "<p style='padding:20px; text-align:center; opacity:0.5;'>첫 번째 멋진 사진을 올려보세요!</p>"; return; }
+        
+        Object.keys(data).reverse().forEach(key => {
+            const post = data[key];
+            let commentsHtml = "";
+            if (post.comments) {
+                Object.keys(post.comments).forEach(cKey => {
+                    const c = post.comments[cKey];
+                    commentsHtml += `<div class="comment-item"><span class="comment-user">${c.writer}:</span><span>${c.text}</span></div>`;
+                });
+            }
+            const div = document.createElement("div"); div.className = "post-item";
+            div.innerHTML = `
+                <div class="post-meta"><span>📷 ${post.author}님의 순간</span><span style="opacity:0.6;">${post.date}</span></div>
+                <img src="${post.imgData}" class="gallery-post-img">
+                <div class="post-content" style="font-weight:bold; margin-bottom:5px;">${post.caption}</div>
+                <div class="comment-section">
+                    <div>${commentsHtml}</div>
+                    <div class="comment-input-box">
+                        <input type="text" id="gallery-input-${key}" class="comment-input" placeholder="이 사진에 감상 댓글을 달아주세요!">
+                        <button class="comment-btn" onclick="addFirebaseComment('gallery', '${key}')">등록</button>
+                    </div>
+                </div>`;
+            container.appendChild(div);
+        });
+    });
+}
+
+/* 💬 3. 실시간 댓글 등록 통합 엔진 */
+function addFirebaseComment(node, postKey) {
     let userData = getDeviceUser();
-    const inputEl = document.getElementById(`${type}-input-${postId}`);
+    const inputEl = document.getElementById(`${node === 'diaries' ? 'diary' : 'gallery'}-input-${postKey}`);
     const text = inputEl.value.trim();
     if (!text) return;
     if (checkBadWords(text)) return; 
 
-    let boardKey = type === 'diary' ? 'diary_board' : 'gallery_board';
-    let boardData = JSON.parse(localStorage.getItem(boardKey)) || [];
-    const idx = boardData.findIndex(p => p.id === postId);
+    const commentData = { writer: userData.nickname, text: text };
     
-    if (idx !== -1) {
-        boardData[idx].comments.push({ writer: userData.nickname, text: text });
-        localStorage.setItem(boardKey, JSON.stringify(boardData));
+    fetch(`${FIREBASE_DB_URL}${node}/${postKey}/comments.json`, {
+        method: 'POST',
+        body: JSON.stringify(commentData)
+    }).then(() => {
         inputEl.value = "";
-        if (type === 'diary') renderDiaryBoard(); else renderGalleryBoard();
-    }
+        if (node === 'diaries') fetchDiaries(); else fetchGallery();
+    });
 }
 
-/* ⚖️ 밸런스 토론 */
+/* ⚖️ 4. 밸런스 토론 */
 function getTodayBalanceTopic() { return balanceTopics[new Date().getDate() % balanceTopics.length]; }
-function renderBalanceBoard() {
-    const topic = getTodayBalanceTopic(); let userData = getDeviceUser();
-    document.getElementById("balanceQuestionTitle").innerText = `⚖️ 오늘의 토론: ${topic.q}`;
-    const optA = document.getElementById("opt-A"); const optB = document.getElementById("opt-B");
-    optA.innerText = topic.a; optB.innerText = topic.b;
-    optA.classList.remove("selected"); optB.classList.remove("selected");
-    if(userData.votedBalanceIds[topic.id] === 'A') optA.classList.add("selected");
-    if(userData.votedBalanceIds[topic.id] === 'B') optB.classList.add("selected");
+
+function fetchBalance() {
+    if (FIREBASE_DB_URL.includes("YOUR_PROJECT_ID")) return;
+    const topic = getTodayBalanceTopic();
+    let userData = getDeviceUser();
     
-    const total = topic.votes.A + topic.votes.B;
-    document.getElementById("balanceStatsText").innerText = `현재 참여 투표: [A] ${Math.round((topic.votes.A/total)*100)}% VS [B] ${Math.round((topic.votes.B/total)*100)}%`;
+    // 투표수와 댓글 가져오기
+    fetch(`${FIREBASE_DB_URL}balance/${topic.id}.json`)
+    .then(res => res.json())
+    .then(data => {
+        let votes = (data && data.votes) ? data.votes : { A: 1, B: 1 };
+        document.getElementById("balanceQuestionTitle").innerText = `⚖️ 오늘의 토론: ${topic.q}`;
+        
+        const optA = document.getElementById("opt-A"); const optB = document.getElementById("opt-B");
+        optA.innerText = topic.a; optB.innerText = topic.b;
+        optA.classList.remove("selected"); optB.classList.remove("selected");
+        
+        if(userData.votedBalanceIds && userData.votedBalanceIds[topic.id] === 'A') optA.classList.add("selected");
+        if(userData.votedBalanceIds && userData.votedBalanceIds[topic.id] === 'B') optB.classList.add("selected");
+        
+        const total = (votes.A || 0) + (votes.B || 0);
+        const percentA = total > 0 ? Math.round(((votes.A || 0)/total)*100) : 50;
+        const percentB = total > 0 ? Math.round(((votes.B || 0)/total)*100) : 50;
+        document.getElementById("balanceStatsText").innerText = `현재 참여 투표: [A] ${percentA}% VS [B] ${percentB}%`;
+        
+        // 밸런스 게시판 댓글 출력
+        const commentContainer = document.getElementById("balanceCommentContainer");
+        commentContainer.innerHTML = "";
+        if (data && data.comments) {
+            Object.keys(data.comments).reverse().forEach(cKey => {
+                const c = data.comments[cKey];
+                const div = document.createElement("div"); div.className = "comment-item";
+                div.innerHTML = `<span class="comment-user">${c.writer}:</span><span>${c.text}</span>`;
+                commentContainer.appendChild(div);
+            });
+        }
+    });
 }
+
 function voteBalance(type) {
     const topic = getTodayBalanceTopic(); let userData = getDeviceUser();
+    if (!userData.votedBalanceIds) userData.votedBalanceIds = {};
     if (userData.votedBalanceIds[topic.id]) { alert("이미 투표하셨습니다!"); return; }
-    userData.votedBalanceIds[topic.id] = type; topic.votes[type]++;
-    saveDeviceUser(userData); renderBalanceBoard();
+    
+    userData.votedBalanceIds[topic.id] = type;
+    saveDeviceUser(userData);
+    
+    // 트랜잭션 대신 간단히 값을 가져와 +1 하고 반영
+    fetch(`${FIREBASE_DB_URL}balance/${topic.id}/votes/${type}.json`)
+    .then(res => res.json())
+    .then(currentCount => {
+        let count = currentCount ? currentCount + 1 : 1;
+        fetch(`${FIREBASE_DB_URL}balance/${topic.id}/votes/${type}.json`, {
+            method: 'PUT',
+            body: count
+        }).then(() => fetchBalance());
+    });
 }
+
 function addBalanceComment() {
+    const topic = getTodayBalanceTopic(); let userData = getDeviceUser();
     const input = document.getElementById("balanceCommentInput");
-    if(checkBadWords(input.value)) return; 
-    input.value = ""; alert("의견이 기록되었습니다.");
+    const text = input.value.trim();
+    if(!text) return;
+    if(checkBadWords(text)) return; 
+
+    const commentData = { writer: userData.nickname, text: text };
+    fetch(`${FIREBASE_DB_URL}balance/${topic.id}/comments.json`, {
+        method: 'POST',
+        body: JSON.stringify(commentData)
+    }).then(() => {
+        input.value = "";
+        fetchBalance();
+    });
 }
 </script>
 </body>
