@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌸 실시간 감정나무 다이어리 & 공유 광장</title>
+<title>🌸 감정나무 다이어리</title>
 
 <style>
 /* 테마별 변수 설정 */
@@ -200,7 +200,6 @@ button:hover{
     border-radius: 20px;
 }
 
-/* 레벨 배지 스타일 */
 .level-badge {
     display: inline-block;
     background: var(--heading-color);
@@ -212,28 +211,28 @@ button:hover{
     margin-top: 5px;
 }
 
+.main-btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
 .diaryBtn{
-    margin-top:20px;
-    width:260px;
-    height:55px;
-    font-size:18px;
+    flex: 1;
+    height: 55px;
+    font-size: 16px;
     background: var(--btn-secondary);
 }
 
-/* 상단 아이콘 버튼들 */
-.board-icon-btn {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    font-size: 28px;
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 5px;
-    transition: transform 0.2s;
+.galleryBtn {
+    flex: 1;
+    height: 55px;
+    font-size: 16px;
+    background: var(--btn-primary);
 }
-.board-icon-btn:hover { transform: scale(1.1); }
 
+/* 상단 아이콘 버튼 */
 .setting-icon-btn {
     position: absolute;
     top: 20px;
@@ -299,32 +298,14 @@ button:hover{
     border: 1px solid rgba(0,0,0,0.1);
 }
 
-/* 게시판 스타일 */
-.board-card {
+/* 사진첩 스타일 */
+.gallery-card {
     max-width: 650px !important;
     text-align: left;
 }
 
-.tabs {
-    display: flex;
-    margin-top: 15px;
-    gap: 10px;
-    border-bottom: 2px solid rgba(0,0,0,0.1);
-    padding-bottom: 5px;
-}
-.tab {
-    padding: 8px 16px;
-    cursor: pointer;
-    font-weight: bold;
-    opacity: 0.5;
-}
-.tab.active {
-    opacity: 1;
-    border-bottom: 3px solid var(--heading-color);
-}
-
 .post-list {
-    max-height: 350px;
+    max-height: 400px;
     overflow-y: auto;
     margin: 15px 0;
     padding-right: 5px;
@@ -347,21 +328,6 @@ button:hover{
     justify-content: space-between;
 }
 
-.post-q {
-    font-size: 14px;
-    font-weight: bold;
-    background: var(--box-accent);
-    padding: 6px 10px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-}
-
-.post-content {
-    font-size: 15px;
-    line-height: 1.4;
-}
-
-/* 사진 갤러리 업로드 영역 */
 .photo-upload-box {
     background: var(--box-accent);
     padding: 15px;
@@ -369,6 +335,23 @@ button:hover{
     margin-bottom: 15px;
     text-align: center;
 }
+
+.upload-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.date-input {
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.1);
+    font-size: 14px;
+    font-family: inherit;
+}
+
 .uploaded-img-preview {
     max-width: 100%;
     max-height: 200px;
@@ -376,66 +359,16 @@ button:hover{
     margin-top: 10px;
     display: none;
 }
+
 .gallery-post-img {
     width: 100%;
-    max-height: 300px;
+    max-height: 350px;
     object-fit: cover;
     border-radius: 12px;
     margin: 10px 0;
     background: #eaeaea;
 }
 
-/* 밸런스 토론 전용 */
-.balance-box {
-    background: var(--box-accent);
-    padding: 15px;
-    border-radius: 15px;
-    margin-bottom: 15px;
-    text-align: center;
-}
-.balance-options {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-.balance-btn {
-    flex: 1;
-    padding: 12px;
-    border-radius: 10px;
-    background: rgba(0,0,0,0.05);
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s;
-}
-.balance-btn.selected {
-    background: var(--btn-primary);
-    transform: scale(1.02);
-}
-.balance-stats {
-    font-size: 12px;
-    margin-top: 5px;
-    opacity: 0.7;
-}
-
-/* 댓글 영역 */
-.comment-section {
-    margin-top: 15px;
-    border-top: 1px dashed rgba(0,0,0,0.1);
-    padding-top: 10px;
-}
-.comment-item {
-    font-size: 13px;
-    padding: 5px 0;
-}
-.comment-user {
-    font-weight: bold;
-    margin-right: 5px;
-}
-.comment-input-box {
-    display: flex;
-    gap: 5px;
-    margin-top: 10px;
-}
 .comment-input {
     flex: 1;
     padding: 8px 12px;
@@ -444,6 +377,7 @@ button:hover{
     font-size: 13px;
     background: rgba(255,255,255,0.7);
 }
+
 .comment-btn {
     padding: 5px 12px;
     font-size: 13px;
@@ -514,9 +448,7 @@ textarea{ width:100%; height:150px; padding:12px; border-radius:15px; border:1px
 
 <body>
 
-<!-- 📌 메인 화면 -->
 <div id="mainScreen" class="screen">
-    <!-- 📅 주간 출석판 -->
     <div id="attendancePanel" onclick="openHistory()" title="한 눈에 한 달 기분 모아보기">
         <div class="attendance-header">
             <h3>이번 주 출석 현황 <span style="font-size: 12px; opacity:0.6;">(클릭 시 달력 보기 📒)</span></h3>
@@ -531,7 +463,6 @@ textarea{ width:100%; height:150px; padding:12px; border-radius:15px; border:1px
     </div>
 
     <div class="card">
-        <button class="board-icon-btn" onclick="openBoard()" title="공유 게시판 가기">📣</button>
         <button class="setting-icon-btn" onclick="openSetting()" title="설정">⚙️</button>
 
         <div id="welcomeText">✨ 정원 ✨</div>
@@ -551,25 +482,26 @@ textarea{ width:100%; height:150px; padding:12px; border-radius:15px; border:1px
         </div>
 
         <h2 id="daysText">총 출석 0일째</h2><br>
-        <button class="diaryBtn" onclick="openDiary()">📔 오늘의 일기 작성</button><br>
+        
+        <div class="main-btn-group">
+            <button class="diaryBtn" onclick="openDiary()">📔 오늘의 일기 작성</button>
+            <button class="galleryBtn" onclick="openGallery()">📸 날짜별 사진첩</button>
+        </div>
     </div>
 </div>
 
-<!-- 📌 일기 작성 화면 -->
 <div id="diaryScreen" class="screen hidden">
     <div class="card">
         <h2>오늘의 질문</h2><br>
         <div id="question" class="questionBox"></div>
         <textarea id="diaryText" placeholder="오늘의 마음을 적어보세요..."></textarea><br><br>
         <div style="display: flex; justify-content: center; gap: 8px;">
-            <button class="saveBtn" style="background:var(--btn-primary);" onclick="saveDiary(true)">저장 및 광장 공유</button>
-            <button class="saveBtn" onclick="saveDiary(false)">나만 저장하기</button>
+            <button class="saveBtn" onclick="saveDiary()">저장하기</button>
             <button class="homeBtn" onclick="goHome()">돌아가기</button>
         </div>
     </div>
 </div>
 
-<!-- 📌 기분 달력 및 감정 분석 화면 -->
 <div id="historyScreen" class="screen hidden">
     <div class="card history-card">
         <h2 id="calendarTitle">기분 달력</h2>
@@ -586,58 +518,29 @@ textarea{ width:100%; height:150px; padding:12px; border-radius:15px; border:1px
     </div>
 </div>
 
-<!-- 📌 공유 게시판 및 밸런스 토론 광장 화면 -->
-<div id="boardScreen" class="screen hidden">
-    <div class="card board-card">
-        <h2 style="text-align:center;">📣 우리들의 광장</h2>
+<div id="galleryScreen" class="screen hidden">
+    <div class="card gallery-card">
+        <h2 style="text-align:center; margin-bottom: 15px;">📸 나의 날짜별 사진첩</h2>
         
-        <div class="tabs">
-            <div class="tab active" id="tab-diary" onclick="switchTab('diary')">친구들의 일기</div>
-            <div class="tab" id="tab-gallery" onclick="switchTab('gallery')">📷 사진 갤러리</div>
-            <div class="tab" id="tab-balance" onclick="switchTab('balance')">⚖️ 밸런스 토론</div>
+        <div class="photo-upload-box">
+            <p style="font-weight:bold; margin-bottom:10px; font-size:14px;">🗓️ 추억의 순간 기록하기</p>
+            <div class="upload-row">
+                <input type="date" id="photoDateInput" class="date-input">
+                <input type="file" id="galleryFileInput" accept="image/*" onchange="previewGalleryImage(event)" style="font-size:13px;">
+            </div>
+            <img id="galleryPreview" class="uploaded-img-preview" src="">
+            <input type="text" id="galleryCaptionInput" class="comment-input" style="margin-top:10px; width:100%;" placeholder="사진에 대한 한 줄 설명이나 메모를 남겨보세요.">
+            <button class="comment-btn" style="margin-top:8px; width:100%; background:var(--btn-primary);" onclick="uploadGalleryPost()">사진첩에 보관하기</button>
         </div>
         
-        <!-- 1. 친구들의 일기 섹션 -->
-        <div id="diaryBoardSection">
-            <div class="post-list" id="postListContainer"></div>
-        </div>
-
-        <!-- 2. 사진 갤러리 섹션 -->
-        <div id="galleryBoardSection" class="hidden">
-            <div class="photo-upload-box">
-                <p style="font-weight:bold; margin-bottom:8px; font-size:14px;">📸 정원의 한 컷 공유하기</p>
-                <input type="file" id="galleryFileInput" accept="image/*" onchange="previewGalleryImage(event)" style="font-size:13px;"><br>
-                <img id="galleryPreview" class="uploaded-img-preview" src="">
-                <input type="text" id="galleryCaptionInput" class="comment-input" style="margin-top:10px; width:100%;" placeholder="사진에 대한 설명을 적어주세요.">
-                <button class="comment-btn" style="margin-top:8px; width:100%; background:var(--btn-primary);" onclick="uploadGalleryPost()">갤러리에 올리기</button>
-            </div>
-            <div class="post-list" id="galleryPostContainer"></div>
-        </div>
-
-        <!-- 3. 밸런스 토론 섹션 -->
-        <div id="balanceBoardSection" class="hidden">
-            <div class="balance-box">
-                <h3 id="balanceQuestionTitle">오늘의 밸런스 질문</h3>
-                <div class="balance-options">
-                    <div class="balance-btn" id="opt-A" onclick="voteBalance('A')">선택 A</div>
-                    <div class="balance-btn" id="opt-B" onclick="voteBalance('B')">선택 B</div>
-                </div>
-                <div class="balance-stats" id="balanceStatsText">투표 정보 계산 중...</div>
-            </div>
-            <div style="display:flex; gap:5px; margin-bottom: 10px;">
-                <input type="text" id="balanceCommentInput" class="comment-input" placeholder="밸런스 게임에 대한 한마디 의견을 나누어보세요!">
-                <button class="comment-btn" onclick="addBalanceComment()">등록</button>
-            </div>
-            <div class="post-list" id="balanceCommentContainer" style="max-height: 180px;"></div>
-        </div>
+        <div class="post-list" id="galleryPostContainer"></div>
         
         <div style="text-align:center; margin-top: 10px;">
-            <button class="homeBtn" onclick="closeBoard()">정원으로 돌아가기</button>
+            <button class="homeBtn" onclick="closeGallery()">정원으로 돌아가기</button>
         </div>
     </div>
 </div>
 
-<!-- 📌 설정 화면 -->
 <div id="settingScreen" class="screen hidden">
     <div class="card" style="text-align: left;">
         <h2 style="text-align: center; margin-bottom: 20px;">⚙️ 개인 설정</h2>
@@ -675,15 +578,9 @@ textarea{ width:100%; height:150px; padding:12px; border-radius:15px; border:1px
     </div>
 </div>
 
-<!-- 🌐 Firebase REST API 연동을 위한 자바스크립트 -->
 <script>
-// ⚠️ 여기에 본인의 파이어베이스 실시간 데이터베이스 URL 주소를 입력하세요!
-const FIREBASE_DB_URL = "https://YOUR_PROJECT_ID.firebaseio.com/"; 
-
 const deviceUserKey = "device_user_profile_v2";
 let selectedMood = ""; 
-let currentQuestion = "";
-let currentTab = "diary";
 let base64ImageTemp = ""; 
 
 const forbiddenWords = ["바보", "멍청이", "짜증나", "지랄", "새끼", "시발", "존나", "꺼져", "극혐"];
@@ -691,7 +588,7 @@ const forbiddenWords = ["바보", "멍청이", "짜증나", "지랄", "새끼", 
 function checkBadWords(text) {
     for (let word of forbiddenWords) {
         if (text.includes(word)) {
-            alert("이런 말은 적으면 친구가 상처받아요 🥺 다른 예쁜 말로 채워볼까요?");
+            alert("예쁜 말 위주로 정원을 가꿔볼까요? 🥺");
             return true; 
         }
     }
@@ -704,11 +601,6 @@ const diaryQuestions = [
     "오늘 나를 가장 힘들게 했던 생각이나 감정이 있나요?",
     "오늘 누군가에게 들었던 말 중 가장 기억에 남는 것은?",
     "내일의 나에게 한 마디 응원을 건넨다면?"
-];
-
-const balanceTopics = [
-    { id: 1, q: "떡볶이를 먹을 때 당신의 선택은?", a: "말랑말랑 떡", b: "양념 쏙 오뎅" },
-    { id: 2, q: "평생 한 가지 음식만 먹어야 한다면?", a: "평생 김치찌개", b: "평생 된장찌개" }
 ];
 
 const moodMentions = {
@@ -724,15 +616,8 @@ window.onload = function() {
     initDeviceUser();
     applyLoadedSettings();
     updateMainScreen();
-    
-    // 5초마다 자동으로 게시판 서버 데이터 갱신하기 (실시간 동기화 대용)
-    setInterval(() => {
-        if (!document.getElementById("boardScreen").classList.contains("hidden")) {
-            if (currentTab === "diary") fetchDiaries();
-            else if (currentTab === "gallery") fetchGallery();
-            else if (currentTab === "balance") fetchBalance();
-        }
-    }, 5000);
+    // 사진 선택 기본 날짜를 오늘로 고정
+    document.getElementById("photoDateInput").valueAsDate = new Date();
 };
 
 function initDeviceUser() {
@@ -740,7 +625,7 @@ function initDeviceUser() {
     if (!userData) {
         userData = {
             nickname: "초보 정원사", fontType: "sans", fontFamily: "Arial, sans-serif", theme: "default",
-            attendanceCount: 0, answersCount: 0, lastSavedDate: "", attendedDays: [], moodHistory: {}, votedBalanceIds: {}
+            attendanceCount: 0, answersCount: 0, lastSavedDate: "", attendedDays: [], moodHistory: {}
         };
         localStorage.setItem(deviceUserKey, JSON.stringify(userData));
     }
@@ -838,7 +723,7 @@ function updateMainScreen() {
     document.getElementById("daysText").innerText = `총 출석 ${userData.attendanceCount}일째`;
     
     const lvlInfo = calculateLevel(userData.answersCount);
-    document.getElementById("userLevelBadge").innerText = `Lv.${lvlInfo.lv} ${lvlInfo.name} (답변: ${userData.answersCount || 0}회)`;
+    document.getElementById("userLevelBadge").innerText = `Lv.${lvlInfo.lv} ${lvlInfo.name} (기록: ${userData.answersCount || 0}회)`;
 
     const treeElement = document.getElementById("tree");
     const count = userData.attendanceCount;
@@ -867,10 +752,9 @@ function openDiary() {
     document.getElementById("diaryScreen").classList.remove("hidden");
 }
 
-function saveDiary(shareWithBoard) {
+function saveDiary() {
     const text = document.getElementById("diaryText").value.trim();
     if (!text) { alert("일기 내용을 작성해주세요!"); return; }
-    if (shareWithBoard && checkBadWords(text)) return; 
 
     let userData = getDeviceUser();
     userData.attendanceCount += 1;
@@ -879,307 +763,9 @@ function saveDiary(shareWithBoard) {
     const prevLvl = calculateLevel(userData.answersCount - 1).lv;
     const nextLvlInfo = calculateLevel(userData.answersCount);
     if (prevLvl < nextLvlInfo.lv) {
-        alert(`🎉 축하합니다! 질문에 성실히 답하여 레벨이 올랐습니다! [Lv.${nextLvlInfo.lv} ${nextLvlInfo.name}] 🪴`);
+        alert(`🎉 축하합니다! 기록을 완료하여 레벨이 올랐습니다! [Lv.${nextLvlInfo.lv} ${nextLvlInfo.name}] 🪴`);
     }
 
     userData.lastSavedDate = new Date().toLocaleDateString();
     const currentDayOfWeek = new Date().getDay();
-    if (!userData.attendedDays.includes(currentDayOfWeek)) userData.attendedDays.push(currentDayOfWeek);
-    saveDeviceUser(userData);
-    
-    if (shareWithBoard) {
-        if (FIREBASE_DB_URL.includes("YOUR_PROJECT_ID")) {
-            alert("서버 연결 설정이 필요합니다. 개발자 가이드를 참고해 주세요!");
-            return;
-        }
-        const newPost = {
-            author: userData.nickname, mood: selectedMood,
-            question: document.getElementById("question").innerText, content: text,
-            date: new Date().toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' })
-        };
-        // Firebase에 일기 저장 (POST)
-        fetch(`${FIREBASE_DB_URL}diaries.json`, {
-            method: 'POST',
-            body: JSON.stringify(newPost)
-        }).then(() => {
-            updateMainScreen();
-            goHome();
-        });
-    } else {
-        updateMainScreen();
-        goHome();
-    }
-}
-
-/* 📅 기분 달력 */
-function openHistory() {
-    document.getElementById("mainScreen").classList.add("hidden");
-    document.getElementById("historyScreen").classList.remove("hidden");
-    const now = new Date();
-    const currentYear = now.getFullYear(); const currentMonth = now.getMonth();
-    document.getElementById("calendarTitle").innerText = `${currentYear}년 ${currentMonth + 1}월 기분 달력`;
-    const grid = document.getElementById("monthlyCalendarGrid");
-    const headers = grid.querySelectorAll(".cal-header");
-    grid.innerHTML = ""; headers.forEach(h => grid.appendChild(h));
-    
-    const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
-    const totalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
-    let userData = getDeviceUser(); let moodHistory = userData.moodHistory || {};
-    let moodCounts = { '🤬':0, '🥺':0, '😰':0, '😭':0, '😊':0, '🤪':0 }; let hasAnyData = false;
-    
-    for (let i = 0; i < firstDayIndex; i++) {
-        const blank = document.createElement("div"); blank.className = "cal-day"; blank.style.visibility = "hidden"; grid.appendChild(blank);
-    }
-    for (let day = 1; day <= totalDays; day++) {
-        const dayCell = document.createElement("div"); dayCell.className = "cal-day has-data";
-        const dayNum = document.createElement("span"); dayNum.innerText = day; dayCell.appendChild(dayNum);
-        const dateKey = `${currentYear}-${currentMonth + 1}-${day}`;
-        if (moodHistory[dateKey]) {
-            const moodEmoji = document.createElement("span"); moodEmoji.className = "cal-mood"; moodEmoji.innerText = moodHistory[dateKey];
-            dayCell.appendChild(moodEmoji); moodCounts[moodHistory[dateKey]]++; hasAnyData = true;
-        }
-        grid.appendChild(dayCell);
-    }
-    const mentDiv = document.getElementById("analysisMent");
-    if (!hasAnyData) mentDiv.innerText = "이번 달에 아직 기록된 기분이 없네요. 🌸";
-    else {
-        let maxMood = ""; let maxCount = -1;
-        for (let m in moodCounts) { if (moodCounts[m] > maxCount) { maxCount = moodCounts[m]; maxMood = m; } }
-        mentDiv.innerHTML = `이번 달은 [ ${maxMood} ] 기분을 많이 느끼셨네요! (총 ${maxCount}회)<br><br>` + moodMentions[maxMood];
-    }
-}
-function closeHistory() { document.getElementById("historyScreen").classList.add("hidden"); document.getElementById("mainScreen").classList.remove("hidden"); }
-
-/* 📣 공유 게시판 및 탭 컨트롤 */
-function openBoard() { document.getElementById("mainScreen").classList.add("hidden"); document.getElementById("boardScreen").classList.remove("hidden"); switchTab("diary"); }
-function closeBoard() { document.getElementById("boardScreen").classList.add("hidden"); document.getElementById("mainScreen").classList.remove("hidden"); }
-function goHome() { document.getElementById("diaryScreen").classList.add("hidden"); document.getElementById("mainScreen").classList.remove("hidden"); }
-
-function switchTab(tabName) {
-    currentTab = tabName;
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    document.getElementById("diaryBoardSection").classList.add("hidden");
-    document.getElementById("galleryBoardSection").classList.add("hidden");
-    document.getElementById("balanceBoardSection").classList.add("hidden");
-    
-    if (tabName === "diary") {
-        document.getElementById("tab-diary").classList.add("active");
-        document.getElementById("diaryBoardSection").classList.remove("hidden");
-        fetchDiaries();
-    } else if (tabName === "gallery") {
-        document.getElementById("tab-gallery").classList.add("active");
-        document.getElementById("galleryBoardSection").classList.remove("hidden");
-        fetchGallery();
-    } else if (tabName === "balance") {
-        document.getElementById("tab-balance").classList.add("active");
-        document.getElementById("balanceBoardSection").classList.remove("hidden");
-        fetchBalance();
-    }
-}
-
-// 🌐 1. 일기 광장 데이터 가져오기
-function fetchDiaries() {
-    if (FIREBASE_DB_URL.includes("YOUR_PROJECT_ID")) return;
-    fetch(`${FIREBASE_DB_URL}diaries.json`)
-    .then(res => res.json())
-    .then(data => {
-        const container = document.getElementById("postListContainer");
-        container.innerHTML = "";
-        if (!data) { container.innerHTML = "<p style='padding:20px; text-align:center; opacity:0.5;'>공유된 일기가 없습니다.</p>"; return; }
-        
-        // 역순 정렬 (최신글 위로)
-        Object.keys(data).reverse().forEach(key => {
-            const post = data[key];
-            let commentsHtml = "";
-            if (post.comments) {
-                Object.keys(post.comments).forEach(cKey => {
-                    const c = post.comments[cKey];
-                    commentsHtml += `<div class="comment-item"><span class="comment-user">${c.writer}:</span><span>${c.text}</span></div>`;
-                });
-            }
-            const div = document.createElement("div"); div.className = "post-item";
-            div.innerHTML = `
-                <div class="post-meta"><span>👤 ${post.author} (${post.mood})</span><span style="opacity:0.6;">${post.date}</span></div>
-                <div class="post-q">Q. ${post.question}</div><div class="post-content">${post.content}</div>
-                <div class="comment-section">
-                    <div>${commentsHtml}</div>
-                    <div class="comment-input-box">
-                        <input type="text" id="diary-input-${key}" class="comment-input" placeholder="따뜻한 댓글을 남겨보세요.">
-                        <button class="comment-btn" onclick="addFirebaseComment('diaries', '${key}')">등록</button>
-                    </div>
-                </div>`;
-            container.appendChild(div);
-        });
-    });
-}
-
-/* 📷 2. 갤러리 로직 */
-function previewGalleryImage(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        base64ImageTemp = e.target.result;
-        const preview = document.getElementById("galleryPreview");
-        preview.src = base64ImageTemp; preview.style.display = "block";
-    };
-    reader.readAsDataURL(file);
-}
-
-function uploadGalleryPost() {
-    let userData = getDeviceUser();
-    const caption = document.getElementById("galleryCaptionInput").value.trim();
-    if (!base64ImageTemp) { alert("공유할 사진을 먼저 선택해 주세요!"); return; }
-    if (checkBadWords(caption)) return; 
-
-    const newGallery = {
-        author: userData.nickname, imgData: base64ImageTemp,
-        caption: caption, date: "방금 전"
-    };
-    
-    fetch(`${FIREBASE_DB_URL}gallery.json`, {
-        method: 'POST',
-        body: JSON.stringify(newGallery)
-    }).then(() => {
-        base64ImageTemp = "";
-        document.getElementById("galleryPreview").style.display = "none";
-        document.getElementById("galleryFileInput").value = "";
-        document.getElementById("galleryCaptionInput").value = "";
-        fetchGallery();
-    });
-}
-
-function fetchGallery() {
-    if (FIREBASE_DB_URL.includes("YOUR_PROJECT_ID")) return;
-    fetch(`${FIREBASE_DB_URL}gallery.json`)
-    .then(res => res.json())
-    .then(data => {
-        const container = document.getElementById("galleryPostContainer");
-        container.innerHTML = "";
-        if(!data) { container.innerHTML = "<p style='padding:20px; text-align:center; opacity:0.5;'>첫 번째 멋진 사진을 올려보세요!</p>"; return; }
-        
-        Object.keys(data).reverse().forEach(key => {
-            const post = data[key];
-            let commentsHtml = "";
-            if (post.comments) {
-                Object.keys(post.comments).forEach(cKey => {
-                    const c = post.comments[cKey];
-                    commentsHtml += `<div class="comment-item"><span class="comment-user">${c.writer}:</span><span>${c.text}</span></div>`;
-                });
-            }
-            const div = document.createElement("div"); div.className = "post-item";
-            div.innerHTML = `
-                <div class="post-meta"><span>📷 ${post.author}님의 순간</span><span style="opacity:0.6;">${post.date}</span></div>
-                <img src="${post.imgData}" class="gallery-post-img">
-                <div class="post-content" style="font-weight:bold; margin-bottom:5px;">${post.caption}</div>
-                <div class="comment-section">
-                    <div>${commentsHtml}</div>
-                    <div class="comment-input-box">
-                        <input type="text" id="gallery-input-${key}" class="comment-input" placeholder="이 사진에 감상 댓글을 달아주세요!">
-                        <button class="comment-btn" onclick="addFirebaseComment('gallery', '${key}')">등록</button>
-                    </div>
-                </div>`;
-            container.appendChild(div);
-        });
-    });
-}
-
-/* 💬 3. 실시간 댓글 등록 통합 엔진 */
-function addFirebaseComment(node, postKey) {
-    let userData = getDeviceUser();
-    const inputEl = document.getElementById(`${node === 'diaries' ? 'diary' : 'gallery'}-input-${postKey}`);
-    const text = inputEl.value.trim();
-    if (!text) return;
-    if (checkBadWords(text)) return; 
-
-    const commentData = { writer: userData.nickname, text: text };
-    
-    fetch(`${FIREBASE_DB_URL}${node}/${postKey}/comments.json`, {
-        method: 'POST',
-        body: JSON.stringify(commentData)
-    }).then(() => {
-        inputEl.value = "";
-        if (node === 'diaries') fetchDiaries(); else fetchGallery();
-    });
-}
-
-/* ⚖️ 4. 밸런스 토론 */
-function getTodayBalanceTopic() { return balanceTopics[new Date().getDate() % balanceTopics.length]; }
-
-function fetchBalance() {
-    if (FIREBASE_DB_URL.includes("YOUR_PROJECT_ID")) return;
-    const topic = getTodayBalanceTopic();
-    let userData = getDeviceUser();
-    
-    // 투표수와 댓글 가져오기
-    fetch(`${FIREBASE_DB_URL}balance/${topic.id}.json`)
-    .then(res => res.json())
-    .then(data => {
-        let votes = (data && data.votes) ? data.votes : { A: 1, B: 1 };
-        document.getElementById("balanceQuestionTitle").innerText = `⚖️ 오늘의 토론: ${topic.q}`;
-        
-        const optA = document.getElementById("opt-A"); const optB = document.getElementById("opt-B");
-        optA.innerText = topic.a; optB.innerText = topic.b;
-        optA.classList.remove("selected"); optB.classList.remove("selected");
-        
-        if(userData.votedBalanceIds && userData.votedBalanceIds[topic.id] === 'A') optA.classList.add("selected");
-        if(userData.votedBalanceIds && userData.votedBalanceIds[topic.id] === 'B') optB.classList.add("selected");
-        
-        const total = (votes.A || 0) + (votes.B || 0);
-        const percentA = total > 0 ? Math.round(((votes.A || 0)/total)*100) : 50;
-        const percentB = total > 0 ? Math.round(((votes.B || 0)/total)*100) : 50;
-        document.getElementById("balanceStatsText").innerText = `현재 참여 투표: [A] ${percentA}% VS [B] ${percentB}%`;
-        
-        // 밸런스 게시판 댓글 출력
-        const commentContainer = document.getElementById("balanceCommentContainer");
-        commentContainer.innerHTML = "";
-        if (data && data.comments) {
-            Object.keys(data.comments).reverse().forEach(cKey => {
-                const c = data.comments[cKey];
-                const div = document.createElement("div"); div.className = "comment-item";
-                div.innerHTML = `<span class="comment-user">${c.writer}:</span><span>${c.text}</span>`;
-                commentContainer.appendChild(div);
-            });
-        }
-    });
-}
-
-function voteBalance(type) {
-    const topic = getTodayBalanceTopic(); let userData = getDeviceUser();
-    if (!userData.votedBalanceIds) userData.votedBalanceIds = {};
-    if (userData.votedBalanceIds[topic.id]) { alert("이미 투표하셨습니다!"); return; }
-    
-    userData.votedBalanceIds[topic.id] = type;
-    saveDeviceUser(userData);
-    
-    // 트랜잭션 대신 간단히 값을 가져와 +1 하고 반영
-    fetch(`${FIREBASE_DB_URL}balance/${topic.id}/votes/${type}.json`)
-    .then(res => res.json())
-    .then(currentCount => {
-        let count = currentCount ? currentCount + 1 : 1;
-        fetch(`${FIREBASE_DB_URL}balance/${topic.id}/votes/${type}.json`, {
-            method: 'PUT',
-            body: count
-        }).then(() => fetchBalance());
-    });
-}
-
-function addBalanceComment() {
-    const topic = getTodayBalanceTopic(); let userData = getDeviceUser();
-    const input = document.getElementById("balanceCommentInput");
-    const text = input.value.trim();
-    if(!text) return;
-    if(checkBadWords(text)) return; 
-
-    const commentData = { writer: userData.nickname, text: text };
-    fetch(`${FIREBASE_DB_URL}balance/${topic.id}/comments.json`, {
-        method: 'POST',
-        body: JSON.stringify(commentData)
-    }).then(() => {
-        input.value = "";
-        fetchBalance();
-    });
-}
-</script>
-</body>
-</html>
+    if (!userData.attendedDays.includes(
